@@ -31,7 +31,7 @@ import moteur as M
 # Thème
 # ==========================================================================
 
-st.set_page_config(page_title="Hachage universel · Projet 7", page_icon="🔐",
+st.set_page_config(page_title="Hachage universel · résistance aux collisions", page_icon="🔐",
                    layout="wide", initial_sidebar_state="expanded")
 
 INK = "#e8e6e1"
@@ -72,6 +72,9 @@ st.markdown(f"""
   .lab-head {{display:flex; align-items:center; gap:10px; margin: 2px 0 8px 0;}}
   .lab-dot {{width:12px; height:12px; border-radius:3px; display:inline-block;}}
   .lab-title {{font-size:1.15rem; font-weight:650; color:{INK};}}
+  .side-title {{font-size:1.75rem; font-weight:800; line-height:1.15; color:{INK};
+      margin: 0 0 18px 0; letter-spacing:-.01em;}}
+  .side-title span {{color:{UNI}; font-size:1.3rem; font-weight:700;}}
   .lab-sub {{font-family: ui-monospace, monospace; font-size:.85rem; color:{INK_2};}}
   .badge {{display:inline-block; padding:3px 10px; border-radius:999px; font-weight:700;
       font-size:.82rem; letter-spacing:.03em;}}
@@ -183,8 +186,8 @@ if "a" not in st.session_state:
     st.session_state.history = []
 
 with st.sidebar:
-    st.markdown("### 🔐 Projet 7")
-    st.caption("Hachage universel · résistance aux collisions")
+    st.markdown("<div class='side-title'>Hachage universel<br>"
+                "<span>· résistance aux collisions</span></div>", unsafe_allow_html=True)
 
     st.markdown("##### Table")
     m = st.slider("Taille de la table  m", 8, 512, 64, step=1,

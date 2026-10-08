@@ -4,16 +4,17 @@ Démonstrateur interactif (Streamlit + Plotly) pour le module *Algorithmique, st
 
 **L'idée en une phrase :** une table de hachage dont la fonction est fixée à l'avance peut toujours être piégée par des clés bien choisies (attaque HashDoS) ; si la fonction est tirée au hasard dans une famille 2-universelle, aucun jeu de clés n'est mauvais en moyenne.
 
-![Attaque HashDoS : déterministe contre universelle](docs/onglet2.png)
+## Interface
 
-## Les quatre onglets
+Barre latérale : taille `m`, nombre de clés `n`, profil des clés (uniforme, séquentiel, attaque DoS `kᵢ = i·m + c`, attaque adaptative avec `(a, b)` divulgués) et bouton **Rééchantillonner (a, b)**.
 
 | Onglet | Contenu |
 |---|---|
-| ① Visualiseur | Alvéoles colorées (idéale / modérée / critique), α, `L_max`, longueur moyenne, cases vides (comparées à `e^(−α)`), insertion / recherche / suppression avec le nombre exact de comparaisons et la chaîne parcourue |
-| ② Laboratoire DoS | `k mod m` (ou Knuth) et Carter-Wegman côte à côte sur les mêmes clés ; attaque `k_i = i·m + c` en un clic ; attaquant qui connaît `(a, b)` ; re-tirage de `(a, b)` qui détruit l'attaque sans changer `m` |
-| ③ Théorèmes & benchmarks | Fréquence empirique de `h(x) = h(y)` sur `N` tirages comparée à `1/m` et à la probabilité exacte ; coût de recherche en fonction de `n` (Θ(n) contre O(1)) ; coût de construction Θ(n²) sous attaque |
-| ④ Fiche soutenance | Définition, théorème de Carter-Wegman et sa preuve, matrice comparative (chaînage, adressage ouvert, AVL, rouge-noir), questions pièges du jury |
+| ⚔️ Stress test | `k mod m` et Carter-Wegman côte à côte sur les mêmes clés : α, `L_max`, cases vides, collisions, profil de charge des alvéoles, rapports de coût A/B, `L_max` au fil des tirages |
+| 🎯 Bornes Monte-Carlo | Fréquence de `h(x) = h(y)` sur `N` tirages de `(a, b)` contre `1/m` (jauge, convergence, statut PASS/FAIL à 3σ) ; histogramme des longueurs de chaînes contre Poisson(α) |
+| 📈 Complexité | Comparaisons et temps par recherche en fonction de `n` (pire cas Θ(n) contre O(1)), pentes mesurées, coût de construction Θ(n²) sous attaque |
+
+![Stress test](docs/onglet1.png)
 
 ## Organisation du code
 

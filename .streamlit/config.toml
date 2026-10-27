@@ -1,9 +1,54 @@
 [browser]
 gatherUsageStats = false
 
+# Thème clair ET sombre : l'utilisateur choisit dans le menu ⋮ > Settings
+# (par défaut, l'application suit le réglage du système).
+# A (fonction fixe) = orange ; B (famille universelle) = bleu-vert.
+
 [theme]
-base = "dark"
-primaryColor = "#3d8bfd"
-backgroundColor = "#0e0f12"
-secondaryBackgroundColor = "#16171b"
-textColor = "#e8e6e1"
+font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+headingFont = "IBM Plex Serif:https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&display=swap"
+codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+baseFontSize = 16
+metricValueFontSize = "1.85rem"
+metricValueFontWeight = 500
+baseRadius = "0.5rem"
+buttonRadius = "0.5rem"
+showSidebarBorder = true
+headingFontWeights = [600, 600, 600, 500, 500, 500]
+
+[theme.light]
+primaryColor = "#1F7F7A"
+backgroundColor = "#F7F8F7"
+secondaryBackgroundColor = "#ECEFEE"
+textColor = "#1A1F24"
+borderColor = "#D5DBD9"
+codeBackgroundColor = "#E6EAE9"
+orangeColor = "#C2512A"
+orangeTextColor = "#A8441F"
+orangeBackgroundColor = "#F6E1D8"
+blueColor = "#1F7F7A"
+blueTextColor = "#176A66"
+blueBackgroundColor = "#D7EDEA"
+chartCategoricalColors = ["#D9623B", "#2A9D8F", "#8C959C", "#C9A227"]
+
+[theme.light.sidebar]
+backgroundColor = "#EEF1F0"
+
+[theme.dark]
+primaryColor = "#4DBDB3"
+backgroundColor = "#111416"
+secondaryBackgroundColor = "#1A1F22"
+textColor = "#E4E7E5"
+borderColor = "#2C3337"
+codeBackgroundColor = "#1E2427"
+orangeColor = "#EE8A63"
+orangeTextColor = "#F29A77"
+orangeBackgroundColor = "#3A2219"
+blueColor = "#4DBDB3"
+blueTextColor = "#62C9BF"
+blueBackgroundColor = "#14302E"
+chartCategoricalColors = ["#E8774F", "#3DB2A5", "#8C959C", "#D4B03A"]
+
+[theme.dark.sidebar]
+backgroundColor = "#15191B"

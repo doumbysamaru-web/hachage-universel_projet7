@@ -55,7 +55,7 @@ BAND = "rgba(140,149,156,.20)"
 
 st.markdown(f"""
 <style>
-  .block-container {{padding-top: 1.4rem; padding-bottom: 2rem; max-width: 1320px;}}
+  .block-container {{padding-top: 4.25rem; padding-bottom: 2rem; max-width: 1320px;}}
   h1 {{letter-spacing: -.01em; font-size: 2.1rem !important; padding: 0 0 .2rem 0 !important;}}
   .fns {{display:flex; flex-wrap:wrap; gap:.5rem; margin:.35rem 0 .2rem 0;}}
   .fn {{font-family:"IBM Plex Mono", monospace; font-size:.86rem; padding:.22rem .6rem;

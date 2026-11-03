@@ -1,6 +1,9 @@
 [browser]
 gatherUsageStats = false
 
+[client]
+toolbarMode = "minimal"
+
 # Thème clair ET sombre : l'utilisateur choisit dans le menu ⋮ > Settings
 # (par défaut, l'application suit le réglage du système).
 # A (fonction fixe) = orange ; B (famille universelle) = bleu-vert.

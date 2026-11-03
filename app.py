@@ -228,7 +228,6 @@ def regime(s: M.TableStats) -> tuple[str, str]:
 if "a" not in st.session_state:
     st.session_state.reproducible = True
     st.session_state.data_seed = 1
-    st.session_state.history = []
     st.session_state.leak = None
     st.session_state.mc_run = 0
     reset_rng(True)
@@ -341,26 +340,6 @@ with tab1:
                 st.badge(label, color=bcol)
             bucket_chart(table.chain_lengths(), s.load_factor, color,
                          y_max if same_scale else max(s.max_chain, 1), key)
-
-    # Historique : une valeur de L_max par tirage, pour cette configuration
-    cfg = (scen, n, m, st.session_state.data_seed, st.session_state.leak)
-    if st.session_state.get("history_cfg") != cfg:
-        st.session_state.history_cfg = cfg
-        st.session_state.history = []
-    hist = st.session_state.history
-    if not hist or hist[-1]["draw"] != st.session_state.draw_id:
-        hist.append({"draw": st.session_state.draw_id, "A": sa.max_chain, "B": sb.max_chain})
-    hd = pd.DataFrame(hist)
-    fig = go.Figure()
-    fig.add_scatter(x=hd.draw, y=hd.A, name="A", mode="lines+markers",
-                    line=dict(color=COL_A, width=2, dash="dot"), marker=dict(size=7))
-    fig.add_scatter(x=hd.draw, y=hd.B, name="B", mode="lines+markers",
-                    line=dict(color=COL_B, width=2.5), marker=dict(size=8))
-    fig.update_layout(height=200, margin=dict(l=4, r=4, t=30, b=4), hovermode="x unified",
-                      xaxis=dict(title="tirage de (a, b)", dtick=1), yaxis=dict(title="liste max", rangemode="tozero"))
-    with st.container(border=True):
-        st.markdown("<div class='panel-h'>Plus longue liste à chaque tirage</div>", unsafe_allow_html=True)
-        plot(fig, "history")
 
 
 # ==========================================================================

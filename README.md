@@ -11,13 +11,12 @@ Deux tables de hachage à chaînage reçoivent **exactement les mêmes clés** ;
 
 L'application ne contient que des réglages, des métriques et des graphiques : les explications sont données à l'oral.
 
-## Les trois vues
+## Les deux vues
 
 | Vue | Réglages | Ce qu'on lit |
 |---|---|---|
 | **Attaque** | Scénario : clés aléatoires · attaque sur `k mod m` · fuite de `(a, b)` ; même échelle | Liste max, collisions, comparaisons et temps mesuré par recherche (A et B), répartition des clés par case |
 | **Pr[collision] ≤ 1/m** | Clés x et y, nombre de tirages, relancer | Fréquence mesurée, 1/m, écart en σ, convergence vers 1/m |
-| **Complexité** | n maximal, α, clés aléatoires en plus | Pente, comparaisons et temps par recherche quand n grandit |
 
 La barre latérale règle `m` et `n`, fait un **nouveau tirage de (a, b)**, affiche le secret et active les **tirages reproductibles**.
 

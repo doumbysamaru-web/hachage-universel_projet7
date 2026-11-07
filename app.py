@@ -7,11 +7,10 @@ des réglages, des métriques et des graphiques.
 * Table A : h(k) = k mod m                       fonction fixe, connue de tous
 * Table B : h(k) = ((a·k + b) mod p) mod m       (a, b) tirés au hasard, secrets
 
-Trois vues :
+Deux vues :
     Attaque       mêmes clés dans A et B (aléatoires, piégées, ou forgées
                   contre un secret divulgué), métriques A / B en direct
     Pr[collision] Monte-Carlo : fréquence mesurée contre 1/m
-    Complexité    comparaisons et temps par recherche quand n grandit
 
     streamlit run app.py
 
@@ -25,10 +24,8 @@ import random
 from typing import Any
 
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from scipy import stats as sps
 
 import moteur as M
 
@@ -51,7 +48,6 @@ DARK = _is_dark()
 COL_A = "#EE8A63" if DARK else "#C2512A"      # A · fonction fixe
 COL_B = "#4DBDB3" if DARK else "#1F7F7A"      # B · famille universelle
 COL_REF = "#8C959C"                           # repères théoriques
-BAND = "rgba(140,149,156,.20)"
 
 st.markdown(f"""
 <style>
@@ -185,16 +181,6 @@ def monte_carlo(x: int, y: int, m: int, trials: int, seed: int) -> dict[str, Any
             "running": np.asarray(e.running_frequency)[idx].tolist()}
 
 
-@st.cache_data(max_entries=16, show_spinner="Mesures pour plusieurs tailles de table…")
-def benchmark(sizes: tuple[int, ...], alpha: float) -> pd.DataFrame:
-    """Mêmes clés et mêmes tirages à chaque passe : on garde le meilleur temps de 3 passes."""
-    runs = [pd.DataFrame([vars(p) for p in M.run_benchmark(sizes, alpha, PROBES, 0, draws=5)])
-            for _ in range(3)]
-    df = runs[0].copy()
-    df["micros_per_search"] = np.minimum.reduce([r["micros_per_search"].to_numpy() for r in runs])
-    return df
-
-
 # ==========================================================================
 # Graphiques
 # ==========================================================================
@@ -268,8 +254,7 @@ st.markdown("<div class='fns'><span class='fn fa'><b>A</b>h(k) = k mod m</span>"
             "<span class='fn fb'><b>B</b>h(k) = ((a·k + b) mod p) mod m · p = 2⁶¹ − 1</span></div>",
             unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs([":material/bolt: Attaque", ":material/casino: Pr[collision] ≤ 1/m",
-                            ":material/trending_up: Complexité"])
+tab1, tab2 = st.tabs([":material/bolt: Attaque", ":material/casino: Pr[collision] ≤ 1/m"])
 
 
 # ==========================================================================
@@ -378,12 +363,8 @@ with tab2:
                 single="100 %" if det else "0 %", color=COL_A)
 
         t = np.array(mc["t"])
-        band = 3 * np.sqrt(p_th * (1 - p_th) / t)
         conv = go.Figure()
-        conv.add_scatter(x=np.r_[t, t[::-1]],
-                         y=np.r_[np.clip(p_th + band, 0, 1), np.clip(p_th - band, 0, 1)[::-1]],
-                         fill="toself", fillcolor=BAND, line=dict(width=0), name="± 3σ", hoverinfo="skip")
-        conv.add_scatter(x=t, y=mc["running"], name="fréquence mesurée (B)", mode="lines",
+        conv.add_scatter(x=t, y=mc["running"], name="fréquence mesurée (B)", mode="lines", showlegend=True,
                          line=dict(color=COL_B, width=2.5),
                          hovertemplate="%{x} tirages · %{y:.4f}<extra></extra>")
         conv.add_hline(y=p_th, line=dict(color=COL_REF, dash="dash", width=1.4),
@@ -396,71 +377,3 @@ with tab2:
         with st.container(border=True):
             st.markdown("<div class='panel-h'>Convergence vers 1/m</div>", unsafe_allow_html=True)
             plot(conv, "conv")
-
-
-# ==========================================================================
-# Vue 3 — Complexité
-# ==========================================================================
-
-with tab3:
-    b1, b2, b3 = st.columns([1, 1, 1], vertical_alignment="bottom")
-    n_max = int(b1.select_slider("n maximal", [500, 1000, 2000, 3000, 4000], value=2000))
-    alpha = float(b2.select_slider("α (clés par case)", [0.5, 1.0, 2.0, 4.0], value=1.0))
-    show_uniform = b3.toggle("Clés aléatoires en plus", value=False)
-    sizes = tuple(sorted({int(v) for v in np.linspace(n_max / 8, n_max, 8)}))
-    bench = benchmark(sizes, alpha)
-
-    adv = bench[bench.scenario == "k mod m · clés adverse"]
-    cw = bench[bench.scenario == "Carter-Wegman · clés adverse"]
-    slope_a = sps.linregress(adv.n, adv.mean_comparisons).slope
-    slope_b = sps.linregress(cw.n, cw.mean_comparisons).slope
-    n_last = int(adv.n.iloc[-1])
-
-    r1, r2, r3, r4 = st.columns(4)
-    with r1:
-        kpi("Pente", fr(slope_a, 2), fr(abs(slope_b), 3),
-            "comparaisons par clé ajoutée")
-    with r2:
-        kpi(f"Comparaisons à n = {fr(n_last)}", fr(adv.mean_comparisons.iloc[-1]),
-            fr(cw.mean_comparisons.iloc[-1]), f"{ratio(adv.mean_comparisons.iloc[-1], cw.mean_comparisons.iloc[-1])}")
-    with r3:
-        kpi(f"Temps à n = {fr(n_last)}", f"{fr(adv.micros_per_search.iloc[-1])} µs",
-            f"{fr(cw.micros_per_search.iloc[-1], 2)} µs", f"{ratio(adv.micros_per_search.iloc[-1], cw.micros_per_search.iloc[-1])}")
-    with r4:
-        kpi("Croissance", "Θ(n)", "O(1)", "recherche, clés piégées")
-
-    series = [("k mod m · clés adverse", COL_A, "A · piégées", "solid"),
-              ("Carter-Wegman · clés adverse", COL_B, "B · piégées", "solid")]
-    if show_uniform:
-        series += [("k mod m · clés uniforme", COL_A, "A · aléatoires", "dot"),
-                   ("Carter-Wegman · clés uniforme", COL_B, "B · aléatoires", "dot")]
-    nn = np.linspace(min(sizes), max(sizes), 100)
-
-    e1, e2 = st.columns(2, gap="medium")
-    fig = go.Figure()
-    for scen_name, col, label, dash in series:
-        d = bench[bench.scenario == scen_name]
-        fig.add_scatter(x=d.n, y=d.mean_comparisons, name=label, mode="lines+markers",
-                        line=dict(color=col, width=2.5, dash=dash), marker=dict(size=7),
-                        hovertemplate="n = %{x} · %{y:.1f}<extra>" + label + "</extra>")
-    fig.add_scatter(x=nn, y=(nn + 1) / 2, name="(n + 1)/2", mode="lines",
-                    line=dict(color=COL_REF, dash="dash", width=1.2), hoverinfo="skip")
-    fig.add_scatter(x=nn, y=np.full_like(nn, 1 + alpha / 2), name="1 + α/2", mode="lines",
-                    line=dict(color=COL_REF, dash="dot", width=1.2), hoverinfo="skip")
-    fig.update_layout(height=400, margin=dict(l=4, r=4, t=30, b=4), hovermode="x unified",
-                      xaxis_title="n", yaxis_title="comparaisons / recherche")
-    with e1.container(border=True):
-        st.markdown("<div class='panel-h'>Comparaisons par recherche</div>", unsafe_allow_html=True)
-        plot(fig, "cmp")
-
-    tf = go.Figure()
-    for scen_name, col, label, dash in series:
-        d = bench[bench.scenario == scen_name]
-        tf.add_scatter(x=d.n, y=d.micros_per_search, name=label, mode="lines+markers",
-                       line=dict(color=col, width=2.5, dash=dash), marker=dict(size=7),
-                       hovertemplate="n = %{x} · %{y:.2f} µs<extra>" + label + "</extra>")
-    tf.update_layout(height=400, margin=dict(l=4, r=4, t=30, b=4), hovermode="x unified",
-                     xaxis_title="n", yaxis_title="µs / recherche")
-    with e2.container(border=True):
-        st.markdown("<div class='panel-h'>Temps mesuré par recherche</div>", unsafe_allow_html=True)
-        plot(tf, "time")
